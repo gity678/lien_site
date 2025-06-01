@@ -12,10 +12,6 @@
       padding: 40px;
     }
 
-    h1 {
-      color: #2c3e50;
-    }
-
     input[type="text"] {
       width: 80%;
       max-width: 400px;
@@ -70,7 +66,7 @@
 <body>
 
   <h1>مرحباً بك 👋</h1>
-  <p>أدخل رابط مدونتك على بلوجر للحصول على روابط مقالاتك تلقائيًا</p>
+  <p>أدخل رابط مدونتك على بلوجر للحصول على روابط مقالاتك</p>
 
   <input type="text" id="blogUrl" placeholder="مثال: https://hollywoodplot.blogspot.com" value="https://hollywoodplot.blogspot.com">
   <br>
@@ -81,53 +77,29 @@
   <script>
     function fetchPosts() {
       const blogUrl = document.getElementById('blogUrl').value.trim();
+      const blogNameMatch = blogUrl.match(/^https?:\/\/([^.]+)\.blogspot\.com/);
 
-      if (!blogUrl || !blogUrl.includes("blogspot.com")) {
+      if (!blogNameMatch) {
         alert("يرجى إدخال رابط صحيح لمدونة بلوجر.");
         return;
       }
 
-      const feedUrl = blogUrl.replace(/\/$/, "") + "/feeds/posts/default?alt=json";
+      const blogName = blogNameMatch[1];
+      const script = document.createElement('script');
+      const callbackName = 'handleBloggerFeed';
 
-      document.getElementById('postsList').innerHTML = '<li>جاري تحميل المقالات...</li>';
-
-      fetch(feedUrl)
-        .then(response => {
-          if (!response.ok) throw new Error("HTTP error " + response.status);
-          return response.json();
-        })
-        .then(data => {
-          const list = document.getElementById('postsList');
-          list.innerHTML = '';
-
-          const entries = data.feed.entry;
-
-          if (!entries || entries.length === 0) {
-            list.innerHTML = '<li>لم يتم العثور على مقالات.</li>';
-            return;
-          }
-
-          entries.forEach(entry => {
-            const title = entry.title.$t;
-            const linkObj = entry.link.find(l => l.rel === "alternate");
-            const link = linkObj ? linkObj.href : "#";
-
-            const li = document.createElement('li');
-            const a = document.createElement('a');
-            a.href = link;
-            a.textContent = title;
-            a.target = "_blank";
-
-            li.appendChild(a);
-            list.appendChild(li);
-          });
-        })
-        .catch(error => {
-          document.getElementById('postsList').innerHTML = '<li>حدث خطأ أثناء تحميل المقالات. تأكد من صحة الرابط.</li>';
-          console.error('خطأ:', error);
-        });
+      script.src = `https://${blogName}.blogspot.com/feeds/posts/default?alt=json-in-script&callback=${callbackName}`;
+      document.body.appendChild(script);
     }
-  </script>
 
-</body>
-</html>
+    function handleBloggerFeed(data) {
+      const list = document.getElementById('postsList');
+      list.innerHTML = '';
+
+      if (!data.feed.entry || data.feed.entry.length === 0) {
+        list.innerHTML = '<li>لم يتم العثور على مقالات.</li>';
+        return;
+      }
+
+      data.feed.entry.forEach(entry => {
+        const title = entry.title.$t;
