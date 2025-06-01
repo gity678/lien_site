@@ -2,104 +2,54 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>جلب روابط مقالات بلوجر</title>
+  <title>روابط المقالات</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
-      color: #333;
-      text-align: center;
-      padding: 40px;
-    }
-
-    input[type="text"] {
-      width: 80%;
-      max-width: 400px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      margin-top: 20px;
-    }
-
-    button {
-      padding: 10px 20px;
-      margin-top: 15px;
-      background-color: #3498db;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    button:hover {
-      background-color: #2980b9;
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-      margin-top: 30px;
-    }
-
-    li {
-      background: #fff;
-      padding: 10px;
-      margin: 10px auto;
-      width: 90%;
-      max-width: 500px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      text-align: right;
+      font-family: Arial;
+      background: #fdfdfd;
+      padding: 30px;
+      direction: ltr;
+      white-space: pre-line;
     }
 
     a {
-      text-decoration: none;
+      display: block;
+      margin-bottom: 10px;
       color: #007BFF;
-    }
-
-    #postsList {
-      margin-top: 30px;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
 
-  <h1>مرحباً بك 👋</h1>
-  <p>أدخل رابط مدونتك على بلوجر للحصول على روابط مقالاتك</p>
-
-  <input type="text" id="blogUrl" placeholder="مثال: https://hollywoodplot.blogspot.com" value="https://hollywoodplot.blogspot.com">
-  <br>
-  <button onclick="fetchPosts()">جلب المقالات</button>
-
-  <ul id="postsList"></ul>
+  <h2>روابط مقالات مدونة hollywoodplot</h2>
+  <div id="links">جارٍ التحميل...</div>
 
   <script>
-    function fetchPosts() {
-      const blogUrl = document.getElementById('blogUrl').value.trim();
-      const blogNameMatch = blogUrl.match(/^https?:\/\/([^.]+)\.blogspot\.com/);
+    function handleFeed(json) {
+      const entries = json.feed.entry || [];
+      const container = document.getElementById('links');
+      container.innerHTML = '';
 
-      if (!blogNameMatch) {
-        alert("يرجى إدخال رابط صحيح لمدونة بلوجر.");
-        return;
+      entries.forEach(entry => {
+        const link = entry.link.find(l => l.rel === "alternate").href;
+        const a = document.createElement('a');
+        a.href = link;
+        a.textContent = link;
+        a.target = "_blank";
+        container.appendChild(a);
+      });
+
+      if (entries.length === 0) {
+        container.textContent = "لا توجد مقالات بعد.";
       }
-
-      const blogName = blogNameMatch[1];
-      const script = document.createElement('script');
-      const callbackName = 'handleBloggerFeed';
-
-      script.src = `https://${blogName}.blogspot.com/feeds/posts/default?alt=json-in-script&callback=${callbackName}`;
-      document.body.appendChild(script);
     }
 
-    function handleBloggerFeed(data) {
-      const list = document.getElementById('postsList');
-      list.innerHTML = '';
+    // استدعاء JSONP
+    const script = document.createElement('script');
+    script.src = "https://hollywoodplot.blogspot.com/feeds/posts/default?alt=json-in-script&callback=handleFeed";
+    document.body.appendChild(script);
+  </script>
 
-      if (!data.feed.entry || data.feed.entry.length === 0) {
-        list.innerHTML = '<li>لم يتم العثور على مقالات.</li>';
-        return;
-      }
-
-      data.feed.entry.forEach(entry => {
-        const title = entry.title.$t;
+</body>
+</html>
