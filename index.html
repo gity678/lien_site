@@ -64,7 +64,7 @@
       padding: 20px 20px;
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      font-size: 22px; /* ✅ تكبير الخط */
+      font-size: 22px;
       direction: ltr;
     }
 
@@ -76,10 +76,9 @@
 
     .copy-btn {
       cursor: pointer;
-      font-size: 22px;
+      font-size: 26px; /* ✅ تكبير الرمز */
       color: #555;
-      margin-right: 10px;
-      margin-left: 10px;
+      margin-left: 16px; /* ✅ إبعاده عن نهاية الرابط */
     }
 
     footer {
@@ -115,7 +114,7 @@
   <script>
     let allLinks = [];
     let currentPage = 1;
-    const linksPerPage = 15;
+    const linksPerPage = 14; // ✅ 14 رابط في الصفحة
 
     function handleFeed(json) {
       const entries = json.feed.entry || [];
@@ -165,7 +164,7 @@
         };
 
         div.appendChild(a);
-        div.appendChild(copyBtn); // ✅ بعد الرابط مباشرة
+        div.appendChild(copyBtn);
         container.appendChild(div);
       });
     }
