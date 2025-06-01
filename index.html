@@ -2,41 +2,35 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>مرحباً بك في جلب روابط المقالات</title>
+  <title>روابط مقالات مدونة بلوجر</title>
   <style>
     body {
       font-family: Arial;
-      background: #f9f9f9;
-      padding: 30px;
+      background-color: #f5f5f5;
       text-align: center;
+      padding: 50px;
+    }
+    h1 {
       color: #333;
     }
-
-    #welcome {
-      margin-top: 100px;
-    }
-
     button {
-      padding: 12px 24px;
+      padding: 12px 20px;
       font-size: 18px;
-      border: none;
-      background-color: #3498db;
+      background-color: #007BFF;
       color: white;
+      border: none;
       border-radius: 8px;
       cursor: pointer;
     }
-
     button:hover {
-      background-color: #2980b9;
+      background-color: #0056b3;
     }
-
     #links {
-      margin-top: 30px;
+      margin-top: 40px;
       text-align: left;
       direction: ltr;
       white-space: pre-line;
     }
-
     a {
       display: block;
       margin-bottom: 10px;
@@ -48,41 +42,41 @@
 <body>
 
   <div id="welcome">
-    <h1>👋 أهلاً بك</h1>
-    <p>اضغط على الزر أدناه لجلب جميع روابط مقالات مدونتك</p>
-    <button onclick="start()">عرض روابط المقالات</button>
+    <h1>👋 مرحباً بك</h1>
+    <p>اضغط على الزر أدناه لجلب روابط جميع مقالات مدونتك</p>
+    <button onclick="loadLinks()">عرض الروابط</button>
   </div>
 
-  <div id="links" style="display: none;">جارٍ التحميل...</div>
+  <div id="links" style="display: none;">جارٍ تحميل الروابط...</div>
 
   <script>
-    let allEntries = [];
+    function handleFeed(json) {
+      const entries = json.feed.entry || [];
+      const container = document.getElementById('links');
+      container.innerHTML = '';
+      entries.forEach(entry => {
+        const link = entry.link.find(l => l.rel === "alternate").href;
+        const a = document.createElement('a');
+        a.href = link;
+        a.textContent = link;
+        a.target = "_blank";
+        container.appendChild(a);
+      });
 
-    function start() {
-      document.getElementById('welcome').style.display = 'none';
-      document.getElementById('links').style.display = 'block';
-      fetchPosts('');
+      if (entries.length === 0) {
+        container.textContent = "لا توجد مقالات.";
+      }
     }
 
-    function fetchPosts(nextPage) {
-      const blog = "hollywoodplot";
-      const callbackName = "handleFeed_" + Math.random().toString(36).substring(7);
-      const url = `https://${blog}.blogspot.com/feeds/posts/default?alt=json-in-script&callback=${callbackName}&max-results=100` + (nextPage ? `&start-index=${nextPage}` : '');
+    function loadLinks() {
+      document.getElementById('welcome').style.display = 'none';
+      document.getElementById('links').style.display = 'block';
 
       const script = document.createElement('script');
-      script.src = url;
+      script.src = "https://hollywoodplot.blogspot.com/feeds/posts/default?alt=json-in-script&max-results=500&callback=handleFeed";
       document.body.appendChild(script);
+    }
+  </script>
 
-      window[callbackName] = function (json) {
-        const entries = json.feed.entry || [];
-        allEntries = allEntries.concat(entries);
-
-        // عرض الروابط الحالية
-        const container = document.getElementById('links');
-        container.innerHTML = '';
-        allEntries.forEach(entry => {
-          const link = entry.link.find(l => l.rel === "alternate").href;
-          const a = document.createElement('a');
-          a.href = link;
-          a.textContent = link;
-          a.target = "_blank";
+</body>
+</html>
