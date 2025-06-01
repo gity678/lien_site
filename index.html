@@ -53,7 +53,7 @@
       max-width: 800px;
       display: flex;
       flex-direction: column;
-      gap: 30px; /* تباعد أكبر بين الروابط */
+      gap: 30px;
     }
 
     .link-item {
@@ -64,21 +64,21 @@
       padding: 20px 20px;
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      font-size: 16px;
+      font-size: 20px; /* تكبير حجم الخط */
     }
 
     .link-item a {
       flex-grow: 1;
       text-decoration: none;
       color: #007BFF;
-      margin-left: 15px;
       word-break: break-all;
     }
 
     .copy-btn {
       cursor: pointer;
-      font-size: 20px;
+      font-size: 22px;
       color: #555;
+      margin-right: 10px;
     }
 
     footer {
@@ -114,7 +114,7 @@
   <script>
     let allLinks = [];
     let currentPage = 1;
-    const linksPerPage = 25;
+    const linksPerPage = 15; // ✅ تعديل عدد الروابط لكل صفحة
 
     function handleFeed(json) {
       const entries = json.feed.entry || [];
@@ -164,7 +164,7 @@
         };
 
         div.appendChild(a);
-        div.appendChild(copyBtn);
+        div.appendChild(copyBtn); // ✅ الآن الزر في نهاية الرابط
         container.appendChild(div);
       });
     }
