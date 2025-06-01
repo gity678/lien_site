@@ -144,7 +144,9 @@
       const container = document.getElementById('links');
       container.innerHTML = '';
 
-      currentLinks.forEach((link, index) => {
+      currentLinks.forEach((link, indexOnPage) => {
+        const globalIndex = start + indexOnPage;
+
         const div = document.createElement('div');
         div.className = 'link-item';
 
@@ -167,10 +169,10 @@
         div.appendChild(copyBtn);
         container.appendChild(div);
 
-        // ✅ بعد كل 10 روابط أو آخر رابط، أضف زر نسخ جماعي
-        if ((index + 1) % 10 === 0 || index === currentLinks.length - 1) {
-          const groupStart = Math.floor(index / 10) * 10;
-          const group = currentLinks.slice(groupStart, index + 1);
+        // ✅ نسخ كل 10 روابط على مستوى جميع الصفحات
+        if ((globalIndex + 1) % 10 === 0 || globalIndex === allLinks.length - 1) {
+          const groupStart = globalIndex - 9 < 0 ? 0 : globalIndex - 9;
+          const group = allLinks.slice(groupStart, globalIndex + 1);
           const groupBtn = document.createElement('button');
           groupBtn.textContent = '📋 نسخ هذه الـ10 روابط';
           groupBtn.style.marginTop = '10px';
@@ -202,3 +204,4 @@
 
 </body>
 </html>
+
