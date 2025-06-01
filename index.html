@@ -72,7 +72,7 @@
   <h1>مرحباً بك 👋</h1>
   <p>أدخل رابط مدونتك على بلوجر للحصول على روابط مقالاتك تلقائيًا</p>
 
-  <input type="text" id="blogUrl" placeholder="مثال: https://yourblog.blogspot.com">
+  <input type="text" id="blogUrl" placeholder="مثال: https://hollywoodplot.blogspot.com" value="https://hollywoodplot.blogspot.com">
   <br>
   <button onclick="fetchPosts()">جلب المقالات</button>
 
@@ -92,20 +92,25 @@
       document.getElementById('postsList').innerHTML = '<li>جاري تحميل المقالات...</li>';
 
       fetch(feedUrl)
-        .then(response => response.json())
+        .then(response => {
+          if (!response.ok) throw new Error("HTTP error " + response.status);
+          return response.json();
+        })
         .then(data => {
-          const entries = data.feed.entry;
           const list = document.getElementById('postsList');
           list.innerHTML = '';
 
-          if (!entries) {
+          const entries = data.feed.entry;
+
+          if (!entries || entries.length === 0) {
             list.innerHTML = '<li>لم يتم العثور على مقالات.</li>';
             return;
           }
 
           entries.forEach(entry => {
             const title = entry.title.$t;
-            const link = entry.link.find(l => l.rel === "alternate").href;
+            const linkObj = entry.link.find(l => l.rel === "alternate");
+            const link = linkObj ? linkObj.href : "#";
 
             const li = document.createElement('li');
             const a = document.createElement('a');
@@ -118,7 +123,7 @@
           });
         })
         .catch(error => {
-          document.getElementById('postsList').innerHTML = '<li>حدث خطأ أثناء تحميل المقالات.</li>';
+          document.getElementById('postsList').innerHTML = '<li>حدث خطأ أثناء تحميل المقالات. تأكد من صحة الرابط.</li>';
           console.error('خطأ:', error);
         });
     }
