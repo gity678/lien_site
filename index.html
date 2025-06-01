@@ -90,6 +90,17 @@
     #pagination {
       margin-top: 40px;
     }
+
+    #copyAllBtn {
+      display: none;
+      margin-top: 10px;
+      font-size: 18px;
+      background-color: #28a745;
+    }
+
+    #copyAllBtn:hover {
+      background-color: #1e7e34;
+    }
   </style>
 </head>
 <body>
@@ -99,6 +110,7 @@
       <h1>👋 مرحباً بك</h1>
       <p>اضغط على الزر أدناه لجلب روابط جميع مقالات مدونتك</p>
       <button onclick="loadLinks()">عرض الروابط</button>
+      <button id="copyAllBtn" onclick="copyAllLinks()">📋 نسخ كل الروابط</button>
     </div>
 
     <div id="links" style="display: none;"></div>
@@ -121,6 +133,9 @@
       allLinks = entries.map(entry => {
         return entry.link.find(l => l.rel === "alternate").href;
       });
+
+      // أظهر الزر الجديد لنسخ كل الروابط
+      document.getElementById('copyAllBtn').style.display = 'inline-block';
 
       showPage(1);
       document.getElementById('pagination').style.display = 'block';
@@ -169,7 +184,6 @@
         div.appendChild(copyBtn);
         container.appendChild(div);
 
-        // ✅ نسخ كل 10 روابط على مستوى جميع الصفحات
         if ((globalIndex + 1) % 10 === 0 || globalIndex === allLinks.length - 1) {
           const groupStart = globalIndex - 9 < 0 ? 0 : globalIndex - 9;
           const group = allLinks.slice(groupStart, globalIndex + 1);
@@ -200,8 +214,18 @@
         showPage(currentPage - 1);
       }
     }
+
+    function copyAllLinks() {
+      if (allLinks.length === 0) return;
+      const text = allLinks.join(',');
+      navigator.clipboard.writeText(text);
+      const btn = document.getElementById('copyAllBtn');
+      btn.textContent = '✅ تم نسخ كل الروابط';
+      setTimeout(() => {
+        btn.textContent = '📋 نسخ كل الروابط';
+      }, 2000);
+    }
   </script>
 
 </body>
 </html>
-
